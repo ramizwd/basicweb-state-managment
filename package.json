@@ -11,11 +11,13 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/ramizwd/basicweb-state-managment.git"
-    },
+  },
   "dependencies": {
     "cookie-parser": "^1.4.5",
     "express": "^4.17.1",
     "express-session": "^1.17.2",
+    "passport": "^0.5.0",
+    "passport-local": "^1.0.0",
     "pug": "^2.0.4"
   }
 }

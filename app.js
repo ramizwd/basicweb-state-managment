@@ -1,12 +1,19 @@
 'use strict';
 const express = require('express');
 const cookieParser = require('cookie-parser');
+const passport = require('./utils/pass');
 const session = require('express-session');
 const app = express();
 const port = 3000;
 
-const username = "foo";
-const password = "bar";
+
+const loggedIn = (req, res, next) =>{
+    if(req.user){
+        next();
+    } else {
+        res.redirect('/form');
+    }
+};
 
 app.set('views', './views');
 app.set('view engine', 'pug');
@@ -17,6 +24,8 @@ app.use(session({
     resave: false,
     saveUninitialized: true
 }));
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.get('/', (req, res) => {
     console.log('cookies', req.cookies);
@@ -28,28 +37,24 @@ app.get('/form', (req, res) => {
     res.render('form');
 });
 
-app.post('/login', (req, res) => {
-    if(req.body.username === username && req.body.password === password){
-        req.session.logged = true;
+app.post('/login',
+    passport.authenticate('local', { failureRedirect: '/form' }),
+    (req, res) => {
+        console.log('success');
         res.redirect('/secret');
-    } else {
-        req.session.logged = false;
-        res.redirect('/form');
-    }
 });
 
-app.get('/secret', (req, res) => {
-    if(req.session.logged === true){
-        res.render('secret');
-    } else {
-        res.redirect('form');
-    }
+app.get('/secret', loggedIn, (req, res) => {
+    res.render('secret');
 });
 
 app.get('/logout', (req, res) => {
+    req.logout();
     req.session.logged = false;
     res.send('Bye!<br><a href="form">sign again<a/>');
 });
+
+
 
 app.get('/setCookie/:clr', (req, res) => {
     res.cookie('color', req.params.clr, { maxAge: 60*60*24*5, httpOnly: true });
