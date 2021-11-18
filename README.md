@@ -1,1 +1,1 @@
-Week 3's Cookies and Sessions section.
+Week 4 assignment - Passport.js.
